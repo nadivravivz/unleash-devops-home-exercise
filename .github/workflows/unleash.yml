@@ -38,7 +38,7 @@ jobs:
         docker rm unleash-task
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -49,7 +49,7 @@ jobs:
 
     - name: Push Docker image to ECR
       run: |
-        docker push ${{ secrets.ECR_REPOSITORY_URI }}:latest
+        docker push 905418187602.dkr.ecr.us-west-2.amazonaws.com/unleash-task:latest
 
     - name: Pulumi Set-up
       uses: pulumi/actions@v5
