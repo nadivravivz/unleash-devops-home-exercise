@@ -41,12 +41,10 @@ jobs:
       uses: pulumi/actions@v5.5.1
       with:
         stack-name: Unleash
-        work-dir: ./pulumi
+        work-dir: pulumi
         
     - name: Pulumi Preview
       run: |
-        ls
-        pwd
         pulumi login --local
         pulumi preview        
 
