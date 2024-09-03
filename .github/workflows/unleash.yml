@@ -37,5 +37,12 @@ jobs:
         docker stop unleash-task
         docker rm unleash-task
 
-
+    - name: Pulumi Set-up
+      uses: pulumi/actions@v5.5.1
+      with:
+        stack_name: Unleash
+        work-dir: ./pulumi
+        
+    - name: Pulumi Preview
+      run:  pulumi preview
         
