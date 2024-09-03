@@ -22,7 +22,7 @@ jobs:
 
     - name: Test Docker Image
       run: |
-        docker run -d -e BUCKET_NAME=${{ secrets.BUCKET_NAME }} --name unleash-task unleash-task:latest
+        docker run -d -e BUCKET_NAME=test-bucket --name unleash-task unleash-task:$(date +%s)
         sleep 10 
         if docker ps | grep unleash-task; then
           echo "Container started successfully"
