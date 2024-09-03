@@ -1,0 +1,11 @@
+encryptionsalt: v1:IfLwxFqp7K8=:v1:n8XLXYgjPwGSHMNh:gsr2hS7qLFBIT9UIb7goHKGmGfJ6IQ==
+config:
+  UnleashTask:security_group_ids:
+    - sg-0f683b5b83c333dba
+  UnleashTask:subnet_ids:
+    - subnet-01ef4e60150d2e394
+    - subnet-01ef4e60150d2e394
+    - subnet-0f9fc96a0cc8eabe2
+  UnleashTask:vpc_id:
+    - vpc-0b476b3f6f33d2df7
+  aws:region: us-west-2

@@ -1,0 +1,13 @@
+name: UnleashTask
+runtime:
+  name: python
+  options:
+    toolchain: pip
+    virtualenv: venv
+description: A minimal AWS Python Pulumi program
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-python
+backend:
+  url: s3://raviv-pulumi/pulumi-state
