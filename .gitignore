@@ -2,3 +2,5 @@ node_modules
 dist
 .vscode/launch.json
 .DS_Store
+*.pyc
+venv/

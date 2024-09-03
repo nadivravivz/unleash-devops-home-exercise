@@ -1,4 +1,5 @@
 import pulumi
+import ecr_unleash
 import pulumi_aws as aws
 
 # Load network configuration from Pulumi config
@@ -84,5 +85,11 @@ node_group = aws.eks.NodeGroup("Raviv-Node",
     instance_types=["t3.micro"],  # Choose instance type
 )
 
+# Access and print the ECR exported outputs directly
+repo_url = ecr_unleash.unleash_task_repo.repository_url
+repo_arn = ecr_unleash.unleash_task_repo.arn
+
 pulumi.export("cluster_name", cluster.name)
 pulumi.export("cluster_endpoint", cluster.endpoint)
+print(f"Repository URL: {repo_url}")
+print(f"Repository ARN: {repo_arn}")
