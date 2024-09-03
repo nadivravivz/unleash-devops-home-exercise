@@ -18,11 +18,11 @@ jobs:
       uses: docker/setup-buildx-action@v3
 
     - name: Build Docker Image
-      run: docker build . --file Dockerfile --tag unleash-task:latest
+      run: docker build . --file Dockerfile --tag 905418187602.dkr.ecr.us-west-2.amazonaws.com/unleash-task:latest
 
     - name: Test Docker Image
       run: |
-        docker run -d -e BUCKET_NAME=test-bucket --name unleash-task unleash-task:latest
+        docker run -d -e BUCKET_NAME=test-bucket --name unleash-task 905418187602.dkr.ecr.us-west-2.amazonaws.com/unleash-task:latest
         sleep 10
         docker logs unleash-task
         if docker ps | grep unleash-task; then
