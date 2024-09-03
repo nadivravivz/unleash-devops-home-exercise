@@ -44,5 +44,8 @@ jobs:
         work-dir: ./pulumi
         
     - name: Pulumi Preview
-      run:  pulumi preview
-        
+      run: |
+        pulumi login --local
+        pulumi preview        
+
+
