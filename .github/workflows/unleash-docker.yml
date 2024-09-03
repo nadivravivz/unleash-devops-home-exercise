@@ -18,11 +18,11 @@ jobs:
       uses: docker/setup-buildx-action@v3
 
     - name: Build Docker Image with Date
-      run: docker build . --file Dockerfile --tag unleash-task:$(date +%s)
+      run: docker build . --file Dockerfile --tag unleash-task:latest
 
     - name: Test Docker Image
       run: |
-        docker run -d -e BUCKET_NAME=test-bucket --name unleash-task unleash-task:$(date +%s)
+        docker run -d -e BUCKET_NAME=test-bucket --name unleash-task unleash-task:latest
         sleep 10 
         if docker ps | grep unleash-task; then
           echo "Container started successfully"
