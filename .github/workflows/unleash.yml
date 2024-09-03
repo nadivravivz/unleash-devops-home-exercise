@@ -40,7 +40,7 @@ jobs:
     - name: Pulumi Set-up
       uses: pulumi/actions@v5.5.1
       with:
-        stack_name: Unleash
+        stack-name: Unleash
         work-dir: ./pulumi
         
     - name: Pulumi Preview
