@@ -45,6 +45,8 @@ jobs:
         
     - name: Pulumi Preview
       run: |
+        ls
+        pwd
         pulumi login --local
         pulumi preview        
 
