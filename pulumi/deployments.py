@@ -1,7 +1,9 @@
 import pulumi
+import pulumi_aws as aws
 import pulumi_kubernetes as k8s
 import re
 import os
+import json
 from datetime import datetime
 
 # Function to get the absolute path to the BUCKETS file
@@ -18,6 +20,61 @@ def get_bucket_names_from_file(file_name):
 # Function to sanitize names for Kubernetes compatibility
 def sanitize_name(name):
     return re.sub(r'[^a-z0-9-]', '-', name.lower())
+
+# Define the EKS cluster name
+cluster_name = "Raviv-EKS-a92d7a9"
+
+# Fetch the existing EKS cluster using get method
+cluster = aws.eks.Cluster.get(cluster_name, cluster_name)
+
+# Fetch the region and account ID
+region = aws.get_region().name
+account_id = aws.get_caller_identity().account_id
+cluster_id = cluster.id
+
+# Create the correct OIDC provider domain name for EKS
+oidc_provider_domain = pulumi.Output.concat(
+    "oidc.eks.", region, ".amazonaws.com/id/", cluster_id
+)
+
+# Create the IAM role with the corrected OIDC provider domain
+role = aws.iam.Role("S3FullAccessRole",
+    assume_role_policy=oidc_provider_domain.apply(lambda domain: json.dumps({
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "Federated": f"arn:aws:iam::{account_id}:oidc-provider/{domain}"
+                },
+                "Action": "sts:AssumeRoleWithWebIdentity",
+                "Condition": {
+                    "StringEquals": {
+                        f"{domain}:sub": "system:serviceaccount:default:s3-full-access",
+                        f"{domain}:aud": "sts.amazonaws.com"
+                    }
+                }
+            }
+        ]
+    }))
+)
+
+# Attach the AmazonS3FullAccess policy to the role
+role_policy_attachment = aws.iam.RolePolicyAttachment("s3FullAccessAttachment",
+    role=role.name,
+    policy_arn="arn:aws:iam::aws:policy/AmazonS3FullAccess"
+)
+
+# Create a Kubernetes Service Account with IAM role
+service_account = k8s.core.v1.ServiceAccount("s3FullAccessServiceAccount",
+    metadata={
+        "name": "s3-full-access",
+        "namespace": "default",
+        "annotations": {
+            "eks.amazonaws.com/role-arn": role.arn
+        }
+    }
+)
 
 # Function to create deployments, services, and a shared ingress resource
 def create_deployments_services_and_ingress(bucket_file_name, provider):
@@ -58,6 +115,7 @@ def create_deployments_services_and_ingress(bucket_file_name, provider):
                         }
                     },
                     "spec": {
+                        "service_account_name": "s3-service-account",  # Use the service account here
                         "containers": [{
                             "name": f"container-{sanitized_name}",
                             "image": "905418187602.dkr.ecr.us-west-2.amazonaws.com/unleash-task:latest",
@@ -97,7 +155,7 @@ def create_deployments_services_and_ingress(bucket_file_name, provider):
         # Add rule for this service
         ingress_rules.append({
             "path": f"/{sanitized_name}",
-            "path_type": "Prefix",  # Ensure pathType is specified
+            "path_type": "Prefix",
             "backend": {
                 "service": {
                     "name": sanitized_name,
