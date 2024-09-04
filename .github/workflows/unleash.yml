@@ -60,14 +60,13 @@ jobs:
     - name: Install dependencies
       run: |
         cd ./pulumi
-        python -m venv venv
+        source venv/bin/activate
         pip install pulumi_aws pulumi_kubernetes
 
     - name: Pulumi Preview
       run: |
         pwd
         cd ./pulumi
-        source venv/bin/activate
         pulumi stack select Unleash
         pulumi preview
       env:
