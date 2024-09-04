@@ -1,6 +1,9 @@
 import pulumi
 import ecr_unleash
+import pulumi_kubernetes as k8s
 import pulumi_aws as aws
+import deployments
+import s3unleash
 
 # Load network configuration from Pulumi config
 config = pulumi.Config()
@@ -68,7 +71,8 @@ cluster = aws.eks.Cluster("Raviv-EKS",
         "security_group_ids": security_group_ids,
     },
     access_config={
-        "authentication_mode": "API_AND_CONFIG_MAP"
+        "authentication_mode": "API_AND_CONFIG_MAP",
+        "bootstrap_cluster_creator_admin_permissions": True
     }
 )
 
@@ -78,12 +82,18 @@ node_group = aws.eks.NodeGroup("Raviv-Node",
     node_role_arn=node_role.arn,
     subnet_ids=subnet_ids,
     scaling_config={
-        "desired_size": 1,
-        "max_size": 1,
+        "desired_size": 3,
+        "max_size": 3,
         "min_size": 1,
     },
-    instance_types=["t3.micro"],  # Choose instance type
+    instance_types=["t3.large"],  # Choose instance type
 )
+
+k8s_provider = k8s.Provider("k8sProvider",)
+
+s3unleash.create_s3_buckets("BUCKETS")
+
+deployments.create_deployments_services_and_ingress('BUCKETS',provider=k8s_provider)
 
 # Access and print the ECR exported outputs directly
 repo_url = ecr_unleash.unleash_task_repo.repository_url
